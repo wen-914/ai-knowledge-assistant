@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 知识助手</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; }
+        #chat-box { border: 1px solid #aaa; padding: 10px; height: 400px; overflow-y: auto; }
+        .msg-user { color: blue; margin: 5px 0; }
+        .msg-ai { color: green; margin: 5px 0; }
+        #upload-section { margin: 10px 0; }
+    </style>
+</head>
+
+<body>
+<h2>AI 知识助手</h2>
+<form id="chat-form">
+    <input id="input" type="text" placeholder="输入消息..." style="width: 80%;" required>
+    <button type="submit">发送</button>
+</form>
+
+<div id="chat-box" style="border:1px solid #aaa; padding:10px; height:400px; overflow-y:auto;"></div>
+
+<div id="upload-section">
+    <h3>上传文档（PDF / TXT）</h3>
+    <input id="file-input" type="file" accept=".pdf,.txt">
+    <button id="upload-btn">上传</button>
+</div>
+
+<script>
+<!--    uvicorn app:app --reload-->
+    const userId = "test_user";
+    const chatBox = document.getElementById("chat-box");
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("input");
+
+    function addMessage(text, sender) {
+        const div = document.createElement("div");
+        div.className = sender === "user" ? "msg-user" : "msg-ai";
+        div.innerText = (sender === "user" ? "你：" : "AI：") + text;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // -------------------- 聊天功能 --------------------
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const msg = input.value;
+        input.value = '';
+        addMessage(msg, 'user');
+
+        const formData = new FormData();
+        formData.append("message", msg);
+        try {
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({user_id: userId, message: msg})
+            });
+
+            const data = await res.json();
+            addMessage(data.reply, "ai");
+
+            if(data.references && data.references.length>0){
+                addMessage("引用文档: " + data.references.join(", "), "ai");
+            }
+        } catch (err) {
+            addMessage("出错：" + err, "ai");
+        }
+    }
+
+    // -------------------- 文档上传功能 --------------------
+    const fileInput = document.getElementById("file-input");
+    const uploadBtn = document.getElementById("upload-btn");
+
+    uploadBtn.onclick = async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("请选择文件！");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/upload", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (res.ok) {
+            addMessage(`文档 "${file.name}" 上传成功！`, 'ai');
+        } else {
+            addMessage(`上传失败：${data.error}`, 'ai');
+        }
+    }
+</script>
+
+</body>
+</html>

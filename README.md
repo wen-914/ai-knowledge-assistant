@@ -1,5 +1,8 @@
 # 简易版AI知识助手
 
+## 界面参考
+<img width="1382" height="1244" alt="image" src="https://github.com/user-attachments/assets/357991d4-c4ae-477c-8a7a-9dc8f833cb74" />
+
 简易版AI知识助手是一个基于FastAPI的文档问答系统，集成了阿里云DashScope的自然语言处理能力，可以上传文档并进行基于文档内容的智能问答。
 
 ## 功能特性

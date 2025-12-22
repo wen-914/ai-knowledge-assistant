@@ -1,5 +1,8 @@
 # AI Knowledge Assistant
 
+## Interface reference
+<img width="1382" height="1244" alt="image" src="https://github.com/user-attachments/assets/357991d4-c4ae-477c-8a7a-9dc8f833cb74" />
+
 AI Knowledge Assistant is a document Q&A system based on FastAPI. It integrates Alibaba Cloud DashScope's natural language processing capabilities, allowing document uploads and intelligent Q&A based on the uploaded documents.
 
 ## Features
